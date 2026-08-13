@@ -1,18 +1,34 @@
 import express from 'express';
-import dotenv from 'dotenv';
-import productosRoutes from './routes/productoRoutes.js';
 import clientesRoutes from './routes/clientesRoutes.js';
-
-dotenv.config();
+import productosRoutes from './routes/productosRoutes.js';
+import vendedoresRoutes from './routes/vendedoresRoutes.js';
+import { AppError } from './utils/AppError.js';
+import { globalErrorHandler } from './middlewares/errorHandler.js';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
+// Middlewares base
 app.use(express.json());
 
-app.use('/api/productos', productosRoutes);
-app.use('/api/clientes', clientesRoutes);
+// Endpoint de Monitoreo (Health Check)
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
+// Registro de Rutas de la API
+app.use('/api/clientes', clientesRoutes);
+app.use('/api/vendedores', vendedoresRoutes);
+app.use('/api/productos', productosRoutes);
+
+// Manejo de Rutas Inexistentes (404)
+app.all(/(.*)/, (req, res, next) => {
+  next(new AppError(`No se pudo encontrar la ruta ${req.originalUrl} en este servidor.`, 404));
+});
+
+// Middleware Centralizado de Errores (debe ir siempre al final)
+app.use(globalErrorHandler);
+
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`Servidor ejecutándose en: http://localhost:${PORT} en modo [${process.env.NODE_ENV || 'development'}]`);
 });

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import express from 'express';
 import {
   obtenerClientes,
   obtenerClientePorId,
@@ -7,13 +7,15 @@ import {
   eliminarCliente
 } from '../controllers/clientesController.js';
 
-const router = Router();
+const router = express.Router();
 
-// Rutas de Clientes
-router.get('/', obtenerClientes);
-router.get('/:id', obtenerClientePorId);
-router.post('/', crearCliente);
-router.put('/:id', actualizarCliente);
-router.delete('/:id', eliminarCliente);
+router.route('/')
+  .get(obtenerClientes)
+  .post(crearCliente);
+
+router.route('/:id')
+  .get(obtenerClientePorId)
+  .put(actualizarCliente)
+  .delete(eliminarCliente);
 
 export default router;

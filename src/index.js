@@ -1,18 +1,16 @@
-import express from 'express'; //Traemos todas las herramientas de la libreria express
+import express from 'express';
 import dotenv from 'dotenv';
-import pool from './config/db.js';// Importamos la conexión a la base de datos
+import productosRoutes from './routes/productos.routes.js';
 
-dotenv.config(); //Leemos el archivo .env y lo cargamos
+dotenv.config();
 
-const app = express(); //Creamos la aplicación y usamos la variable app para manejarla
-const PORT = process.env.PORT || 3000; //Definimos el puerto en el que correrá la aplicación, si no está definido en el .env, usará 3000 por defecto
+const app = express();
+const PORT = process.env.PORT || 3000;
 
-app.use(express.json()); //Middleware para que la aplicación pueda recibir y procesar datos en formato JSON
+app.use(express.json());
 
-app.get('/', (req, res) => {
-    res.send({mensaje: 'Backned de CARPINTER_APP esta activo.'}); //Creacion de la primera ruta (Endpoint) para verificar que el backend está activo
-});
+app.use('/api/productos', productosRoutes);
 
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://localhost:${PORT}`); //Le dice al servidor que escuche en el puerto definido y muestra un mensaje en la consola indicando que está corriendo
+    console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });

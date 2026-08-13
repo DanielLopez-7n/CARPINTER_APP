@@ -1,0 +1,9 @@
+    =========================================
+    DOCUMENTACIÓN DE CAMBIOS - CARPINTER_APP
+    =========================================
+
+    TRABAJO REALIZADO DIA 13 DE AGOSTO DE 2026
+
+    DESCRIPCION: Se cambia el archivo de inventario a formato moderno 
+    .xlsx y se ajusta el script de migración para que limpie automáticamente 
+    espacios invisibles en los nombres de las columnas.

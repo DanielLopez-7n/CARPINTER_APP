@@ -1,0 +1,83 @@
+===============================================================================
+  DOCUMENTACIÓN DE CAMBIOS Y ARQUITECTURA DEL PROYECTO - CARPINTER_APP
+===============================================================================
+
+TRABAJO REALIZADO 13 DE AGOSTO DE 2026
+
+OBJETIVO GENERAL:
+Refactorizar la estructura base de Express para cumplir con estándares de software
+profesional listos para producción. Se eliminó la dependencia directa entre controladores
+y la base de datos, agregando una capa de servicios, un manejador global de errores
+y la estandarización de respuestas HTTP.
+
+-------------------------------------------------------------------------------
+1. CAPA TRANSVERSAL Y MANEJO DE ERRORES (src/utils/ y src/middlewares/)
+-------------------------------------------------------------------------------
+- src/utils/AppError.js:
+  * Clase personalizada que extiende de Error.
+  * Permite lanzar errores operacionales controlados definiendo el código de estado
+    HTTP (400, 404, 409, etc.) y un mensaje claro para el cliente.
+  * Marca los errores con la propiedad `isOperational: true`.
+
+- src/utils/asyncHandler.js:
+  * Función de orden superior (wrapper) para funciones asíncronas.
+  * Captura automáticamente cualquier promesa rechazada (errores) en las rutas
+    y la pasa al siguiente middleware con `next(err)`.
+  * Elimina por completo la necesidad de escribir bloques try/catch en todos
+    los controladores.
+
+- src/middlewares/errorHandler.js:
+  * Middleware centralizado para el tratamiento de errores.
+  * Intercepta automáticamente errores de MySQL (ej. entradas duplicadas ER_DUP_ENTRY
+    o restricciones de llaves foráneas ER_ROW_IS_REFERENCED_2) y los transforma
+    en respuestas HTTP entendibles.
+  * En entorno de Desarrollo (`development`) entrega el Stack Trace completo.
+  * En entorno de Producción (`production`) oculta detalles técnicos sensibles
+    y solo retorna mensajes seguros para el cliente.
+
+-------------------------------------------------------------------------------
+2. ARQUITECTURA CONTROLLER - SERVICE (src/services/ y src/controllers/)
+-------------------------------------------------------------------------------
+Se aplicó la separación de responsabilidades para los módulos de CLIENTES, 
+VENDEDORES y PRODUCTOS:
+
+a) Capa de Servicios (src/services/):
+   - Contiene la lógica de negocio pura y la ejecución de sentencias SQL mediante
+     el pool de conexiones (`pool.query`).
+   - Archivos: `clientesService.js`, `vendedoresService.js`, `productosService.js`.
+   - Funciones creadas/migradas por módulo:
+     * getAll...(): Consulta todos los registros de la tabla.
+     * get...ById(): Busca un registro por ID y lanza AppError(404) si no existe.
+     * create...(): Valida campos obligatorios e inserta en la BD.
+     * update...(): Actualiza los datos y valida si el registro existía.
+     * delete...(): Elimina un registro y confirma si afectó filas.
+
+b) Capa de Controladores (src/controllers/):
+   - Solo reciben la petición (`req`), invocan la función correspondiente del Service
+     y retornan la respuesta HTTP (`res`) en formato JSON estandarizado.
+   - Archivos refactorizados: `clientesController.js`, `vendedoresController.js`,
+     `productosController.js`.
+
+-------------------------------------------------------------------------------
+3. RUTAS Y CONFIGURACIÓN DEL SERVIDOR (src/routes/ y src/index.js)
+-------------------------------------------------------------------------------
+- src/routes/productosRoutes.js:
+  * Creación y mapeo de las rutas HTTP (GET, POST, PUT, DELETE) para el módulo
+    de Productos apuntando a sus respectivos controladores.
+
+- src/index.js:
+  * Importación y registro del módulo de Productos (`/api/productos`).
+  * Endpoint de Monitoreo (`GET /api/health`): Retorna un estado 200 con marca de
+    tiempo para verificación de disponibilidad en servidores de producción.
+  * Manejo de rutas inexistentes (404): Actualizado a la sintaxis `app.all(/(.*)/)`
+    compatible con Express moderno / path-to-regexp v8+.
+  * Registro del `globalErrorHandler` al final de la cadena de middlewares.
+
+-------------------------------------------------------------------------------
+4. MIGRACIÓN DE DATOS E INVENTARIO (src/migrar_excel_a_SQL.js)
+-------------------------------------------------------------------------------
+- Cambio del archivo fuente de inventario a formato `.xlsx`.
+- Normalización automática de encabezados: Se implementó `.trim().toUpperCase()`
+  al leer las filas del Excel para eliminar espacios invisibles al inicio/final
+  de las columnas (evitando que el mapeo de llaves de lectura retorne undefined).
+===============================================================================

@@ -33,37 +33,105 @@ async function iniciarMigracion() {
         await pool.query(createTableSQL);
 
         // ==========================================
-        // MIGRACIÓN DE PRODUCTOS
-        // ==========================================
-        console.log("\n3. Leyendo el archivo Excel 'inventario.xls'...");
-        const wbInventario = xlsx.readFile('data/inventario.xls'); // Nombre exacto
-        const filasInventario = xlsx.utils.sheet_to_json(wbInventario.Sheets[wbInventario.SheetNames[0]], { defval: null });
+// MIGRACIÓN DE PRODUCTOS
+// ==========================================
+console.log("\n3. Leyendo el archivo Excel 'inventario.xlsx'...");
+const wbInventario = xlsx.readFile('data/inventario.xlsx');
+const sheetName = wbInventario.SheetNames[0];
+const sheet = wbInventario.Sheets[sheetName];
 
-        const sqlProductos = `
-            INSERT INTO productos 
-            (id, codigo, grupo, articulo, unidad, codigo_barras, referencia, costo_promedio, proveedor, precio_venta, stock_cantidad)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE 
-                articulo = VALUES(articulo), costo_promedio = VALUES(costo_promedio),
-                precio_venta = VALUES(precio_venta), stock_cantidad = VALUES(stock_cantidad);
-        `;
+// 1. Leemos filas en bruto para ubicar la fila de encabezados
+const filasBrutas = xlsx.utils.sheet_to_json(sheet, { header: 1 });
 
-        let insertadosProd = 0;
-        for (const fila of filasInventario) {
-            const id = fila['ID'] || fila['id'] || null;
-            const codigo = fila['CODIGO'] || fila['codigo'] || null;
-            const articulo = fila['ARTICULO'] || fila['articulo'] || null;
-            
-            if (!articulo && !codigo && !id) continue;
+let filaEncabezadoIndex = 0;
+for (let i = 0; i < filasBrutas.length; i++) {
+    const filaTexto = JSON.stringify(filasBrutas[i] || []).toUpperCase();
+    if (
+        filaTexto.includes('ARTICULO') || 
+        filaTexto.includes('CODIGO') || 
+        filaTexto.includes('REFERENCIA') || 
+        filaTexto.includes('VENTA')
+    ) {
+        filaEncabezadoIndex = i;
+        break;
+    }
+}
 
-            await pool.query(sqlProductos, [
-                id, codigo, fila['GRUPO'], articulo, fila['UE'], fila['COD. BARRAS'], fila['REFERENCIA'],
-                parseFloat(fila['COSTO PROM'] || 0) || 0, fila['PROVEEDOR'], 
-                parseFloat(fila['VENTA'] || 0) || 0, parseInt(fila['CANT'] || 0, 10) || 0
-            ]);
-            insertadosProd++;
+console.log(`🔍 Encabezados detectados en la fila ${filaEncabezadoIndex + 1} del Excel.`);
+
+// 2. Convertimos a JSON arrancando desde la fila encontrada
+const filasInventario = xlsx.utils.sheet_to_json(sheet, { range: filaEncabezadoIndex, defval: null });
+
+// 3. LIMPIEZA DE ESPACIOS: Normalizamos las llaves del objeto (quitamos espacios ' CODIGO ' -> 'CODIGO')
+const filasLimpias = filasInventario.map(fila => {
+    const filaLimpia = {};
+    for (const key in fila) {
+        if (Object.prototype.hasOwnProperty.call(fila, key)) {
+            const claveLimpia = key.trim().toUpperCase();
+            filaLimpia[claveLimpia] = fila[key];
         }
-        console.log(`-> ¡Éxito! ${insertadosProd} productos procesados correctamente.`);
+    }
+    return filaLimpia;
+});
+
+if (filasLimpias.length === 0) {
+    console.log("⚠️ No se encontraron filas de datos para procesar.");
+} else {
+    console.log("📌 Columnas normalizadas sin espacios:", Object.keys(filasLimpias[0]));
+}
+
+// 4. Consulta SQL de inserción
+const sqlProductos = `
+    INSERT INTO productos 
+    (codigo, grupo, articulo, unidad, codigo_barras, referencia, costo_promedio, proveedor, precio_venta, stock_cantidad)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON DUPLICATE KEY UPDATE 
+        grupo = VALUES(grupo),
+        articulo = VALUES(articulo),
+        unidad = VALUES(unidad),
+        codigo_barras = VALUES(codigo_barras),
+        referencia = VALUES(referencia),
+        costo_promedio = VALUES(costo_promedio),
+        proveedor = VALUES(proveedor),
+        precio_venta = VALUES(precio_venta),
+        stock_cantidad = VALUES(stock_cantidad);
+`;
+
+let insertadosProd = 0;
+for (const fila of filasLimpias) {
+    // Ahora las llaves coinciden exactamente
+    const codigo = fila['CODIGO'] || fila['COD. BARRAS'] || fila['COD'] || null;
+    const articulo = fila['ARTICULO'] || fila['DESCRIPCION'] || null;
+    const grupo = fila['GRUPO'] || null;
+    const unidad = fila['UE'] || fila['U.E.'] || fila['UNIDAD'] || null;
+    const codigoBarras = fila['COD. BARRAS'] || fila['CODIGO_BARRAS'] || null;
+    const referencia = fila['REFERENCIA'] || null;
+    const proveedor = fila['PROVEEDOR'] || null;
+
+    const costoProm = parseFloat(fila['COSTO PROM'] || fila['COSTO_PROMEDIO'] || 0) || 0;
+    const precioVenta = parseFloat(fila['VENTA'] || fila['PRECIO_VENTA'] || 0) || 0;
+    const stockCant = parseInt(fila['CANT'] || fila['STOCK_CANTIDAD'] || 0, 10) || 0;
+
+    // Si la fila no tiene ni artículo ni código, se ignora
+    if (!articulo && !codigo) continue;
+
+    await pool.query(sqlProductos, [
+        codigo,
+        grupo,
+        articulo,
+        unidad,
+        codigoBarras,
+        referencia,
+        costoProm,
+        proveedor,
+        precioVenta,
+        stockCant
+    ]);
+
+    insertadosProd++;
+}
+
+console.log(`-> ¡Éxito! ${insertadosProd} productos procesados correctamente.`);
 
         // ==========================================
         // MIGRACIÓN DE VENDEDORES

@@ -9,7 +9,12 @@ import {
 
 const router = Router();
 
-// Rutas de Vendedores
+// Rutas para manejar vendedores
+// - GET '/'       : lista todos los vendedores
+// - GET '/:id'    : obtiene el vendedor con ese id
+// - POST '/'      : crea un nuevo vendedor (datos en req.body)
+// - PUT '/:id'    : actualiza el vendedor indicado
+// - DELETE '/:id' : elimina el vendedor indicado
 router.get('/', obtenerVendedores);
 router.get('/:id', obtenerVendedorPorId);
 router.post('/', crearVendedor);

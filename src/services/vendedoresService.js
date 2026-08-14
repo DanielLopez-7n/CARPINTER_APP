@@ -1,11 +1,18 @@
 import pool from '../config/db.js';
 import { AppError } from '../utils/AppError.js';
 
+// Devuelve todos los vendedores
+// - No necesita parámetros.
+// - Retorna un arreglo con todos los vendedores (ordenados por CODIGO desc).
 export const getAllVendedores = async () => {
   const [rows] = await pool.query('SELECT * FROM vendedores ORDER BY CODIGO DESC');
   return rows;
 };
 
+// Busca un vendedor por su id (CODIGO)
+// - id: identificador del vendedor (req.params.id desde la ruta).
+// - Si no existe, lanza un error 404.
+// - Si existe, devuelve el objeto del vendedor.
 export const getVendedorById = async (id) => {
   const [rows] = await pool.query('SELECT * FROM vendedores WHERE CODIGO = ?', [id]);
   if (rows.length === 0) {
@@ -14,6 +21,9 @@ export const getVendedorById = async (id) => {
   return rows[0];
 };
 
+// Crea un vendedor nuevo
+// - vendedorData: objeto con nombre (obligatorio) y otros campos opcionales.
+// - Devuelve el vendedor creado con su nuevo codigo.
 export const createVendedor = async (vendedorData) => {
   const { nombre, apellidos, identificacion, direccion, telefono, celular, e_mail } = vendedorData;
 
@@ -38,6 +48,11 @@ export const createVendedor = async (vendedorData) => {
   return { codigo: result.insertId, ...vendedorData };
 };
 
+// Actualiza un vendedor existente
+// - id: codigo del vendedor a actualizar.
+// - vendedorData: campos a modificar.
+// - Si no existe, lanza un error 404.
+// - Devuelve el objeto con el codigo y los datos enviados.
 export const updateVendedor = async (id, vendedorData) => {
   const { nombre, apellidos, identificacion, direccion, telefono, celular, e_mail } = vendedorData;
 
@@ -55,6 +70,10 @@ export const updateVendedor = async (id, vendedorData) => {
   return { codigo: id, ...vendedorData };
 };
 
+// Elimina un vendedor por su id
+// - id: codigo del vendedor a borrar.
+// - Si no existe, lanza un error 404.
+// - Si se elimina, devuelve true.
 export const deleteVendedor = async (id) => {
   const [result] = await pool.query('DELETE FROM vendedores WHERE CODIGO = ?', [id]);
 

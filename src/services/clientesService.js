@@ -1,11 +1,18 @@
 import pool from '../config/db.js';
 import { AppError } from '../utils/AppError.js';
 
+// Devuelve todos los clientes
+// - No necesita parámetros.
+// - Retorna un arreglo con todos los clientes (ordenados por código desc).
 export const getAllClientes = async () => {
   const [rows] = await pool.query('SELECT * FROM clientes ORDER BY codigo DESC');
   return rows;
 };
 
+// Busca un cliente por su id (codigo)
+// - id: identificador del cliente (req.params.id desde la ruta).
+// - Si no existe, lanza un error 404.
+// - Si existe, devuelve el objeto del cliente.
 export const getClienteById = async (id) => {
   const [rows] = await pool.query('SELECT * FROM clientes WHERE codigo = ?', [id]);
   if (rows.length === 0) {
@@ -14,6 +21,9 @@ export const getClienteById = async (id) => {
   return rows[0];
 };
 
+// Crea un cliente nuevo
+// - clienteData: objeto con los campos del cliente (cliente = nombre es obligatorio).
+// - Devuelve el cliente creado con su nuevo codigo.
 export const createCliente = async (clienteData) => {
   const { cliente, identificacion, e_mail, telefono, celulares, direccion, nombre_comercial } = clienteData;
 
@@ -38,6 +48,11 @@ export const createCliente = async (clienteData) => {
   return { codigo: result.insertId, ...clienteData };
 };
 
+// Actualiza los datos de un cliente existente
+// - id: codigo del cliente a actualizar.
+// - clienteData: campos que se quieren cambiar.
+// - Si el cliente no existe, lanza un error 404.
+// - Devuelve el objeto con el codigo y los datos enviados.
 export const updateCliente = async (id, clienteData) => {
   const { cliente, identificacion, e_mail, telefono, celulares, direccion, nombre_comercial } = clienteData;
 
@@ -55,6 +70,10 @@ export const updateCliente = async (id, clienteData) => {
   return { codigo: id, ...clienteData };
 };
 
+// Elimina un cliente por su id
+// - id: codigo del cliente a borrar.
+// - Si no existe, lanza un error 404.
+// - Si se elimina, devuelve true.
 export const deleteCliente = async (id) => {
   const [result] = await pool.query('DELETE FROM clientes WHERE codigo = ?', [id]);
 

@@ -1,9 +1,10 @@
 import { asyncHandler } from '../utils/asyncHandler.js';
 import * as vendedoresService from '../services/vendedoresService.js';
 
-// Trae todos los vendedores
-// - No necesita datos en la ruta.
-// - Devuelve la lista de vendedores y el total.
+// obtenerVendedores:
+// - Devuelve todos los vendedores guardados.
+// - No necesita datos del cliente.
+// - Responde con la lista y la cantidad encontrada.
 export const obtenerVendedores = asyncHandler(async (req, res) => {
   const vendedores = await vendedoresService.getAllVendedores();
   res.status(200).json({
@@ -13,9 +14,9 @@ export const obtenerVendedores = asyncHandler(async (req, res) => {
   });
 });
 
-// Trae un vendedor por su id
-// - req.params.id: id del vendedor.
-// - Devuelve los datos de ese vendedor.
+// obtenerVendedorPorId:
+// - Recibe el id en la URL.
+// - Devuelve los datos de ese vendedor si existe, o un error si no existe.
 export const obtenerVendedorPorId = asyncHandler(async (req, res) => {
   const vendedor = await vendedoresService.getVendedorById(req.params.id);
   res.status(200).json({
@@ -24,9 +25,9 @@ export const obtenerVendedorPorId = asyncHandler(async (req, res) => {
   });
 });
 
-// Crea un nuevo vendedor
-// - req.body: datos del vendedor (nombre, contacto, etc.).
-// - Devuelve el vendedor creado y un mensaje de confirmación.
+// crearVendedor:
+// - Recibe los datos del vendedor en el cuerpo de la petición.
+// - Crea el vendedor y responde con sus datos y un mensaje de éxito.
 export const crearVendedor = asyncHandler(async (req, res) => {
   const nuevoVendedor = await vendedoresService.createVendedor(req.body);
   res.status(201).json({
@@ -36,10 +37,9 @@ export const crearVendedor = asyncHandler(async (req, res) => {
   });
 });
 
-// Actualiza un vendedor existente
-// - req.params.id: id del vendedor a actualizar.
-// - req.body: campos a modificar.
-// - Devuelve el vendedor actualizado.
+// actualizarVendedor:
+// - Recibe el id en la URL y los campos a cambiar en el cuerpo de la petición.
+// - Actualiza el vendedor y responde con los datos enviados.
 export const actualizarVendedor = asyncHandler(async (req, res) => {
   const vendedorActualizado = await vendedoresService.updateVendedor(req.params.id, req.body);
   res.status(200).json({
@@ -49,9 +49,9 @@ export const actualizarVendedor = asyncHandler(async (req, res) => {
   });
 });
 
-// Elimina un vendedor por su id
-// - req.params.id: id del vendedor a eliminar.
-// - Devuelve un mensaje que confirma la eliminación.
+// eliminarVendedor:
+// - Recibe el id en la URL.
+// - Borra el vendedor y responde con un mensaje que confirma la eliminación.
 export const eliminarVendedor = asyncHandler(async (req, res) => {
   await vendedoresService.deleteVendedor(req.params.id);
   res.status(200).json({

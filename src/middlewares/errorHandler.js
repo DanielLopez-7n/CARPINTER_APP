@@ -1,5 +1,9 @@
 import { AppError } from '../utils/AppError.js';
 
+// globalErrorHandler:
+// - Atiende cualquier error que ocurra en la aplicación.
+// - Convierte errores conocidos en mensajes fáciles de entender para el cliente.
+// - En desarrollo muestra más detalles; en producción sólo muestra un mensaje simple.
 export const globalErrorHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';

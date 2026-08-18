@@ -16,3 +16,7 @@ Thumbs.db
 
 # Configuración del editor (Opcional)
 .vscode/
+
+# Archivos sensibles
+desktop.ini
+data/

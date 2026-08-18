@@ -1,5 +1,5 @@
 import pool from '../config/db.js';
-import { AppError } from '../utils/AppError.js';
+import AppError from '../utils/AppError.js';
 
 // Devuelve todos los clientes
 // - No necesita parámetros.

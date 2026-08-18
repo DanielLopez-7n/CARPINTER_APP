@@ -1,8 +1,8 @@
-const pedidosService = require('../services/pedidosService');
-const asyncHandler = require('../utils/asyncHandler');
+import pedidosService from '../services/pedidosService.js';
+import asyncHandler from '../utils/asyncHandler.js';
 
+// Controlador para manejar las operaciones relacionadas con los pedidos
 const pedidosController = {
-    // 1. Crear un pedido completo (Cabecera + Detalle)
     crearPedido: asyncHandler(async (req, res) => {
         const nuevoPedido = await pedidosService.crearPedido(req.body);
         res.status(201).json({
@@ -11,7 +11,7 @@ const pedidosController = {
         });
     }),
 
-    // 2. Obtener el listado general de pedidos
+    // Obtener todos los pedidos
     obtenerTodos: asyncHandler(async (req, res) => {
         const pedidos = await pedidosService.obtenerTodos();
         res.status(200).json({
@@ -21,7 +21,7 @@ const pedidosController = {
         });
     }),
 
-    // 3. Obtener un pedido específico por ID con sus detalles
+    // Obtener un pedido por su ID
     obtenerPorId: asyncHandler(async (req, res) => {
         const { id } = req.params;
         const pedido = await pedidosService.obtenerPorId(id);
@@ -32,4 +32,4 @@ const pedidosController = {
     })
 };
 
-module.exports = pedidosController;
+export default pedidosController;

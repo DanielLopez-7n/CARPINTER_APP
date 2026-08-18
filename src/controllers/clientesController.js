@@ -1,4 +1,4 @@
-import { asyncHandler } from '../utils/asyncHandler.js';
+import  asyncHandler from '../utils/asyncHandler.js';
 import * as clientesService from '../services/clientesService.js';
 
 // obtenerClientes:

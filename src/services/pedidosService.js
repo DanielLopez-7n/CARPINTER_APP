@@ -1,11 +1,8 @@
-const db = require('../config/db'); // Importa la conexión a MySQL
-const AppError = require('../utils/AppError');
+import db from '../config/db.js';
+import AppError from '../utils/AppError.js';
 
+// Servicio para manejar la lógica de negocio relacionada con los pedidos
 const pedidosService = {
-
-    // =======================================================
-    // 1. CREAR UN NUEVO PEDIDO (CABECERA + DETALLE)
-    // =======================================================
     crearPedido: async (datosPedido) => {
         const {
             cliente_codigo,
@@ -17,27 +14,22 @@ const pedidosService = {
             cliente_telefono,
             orden_compra,
             forma_pago,
-            detalles // Arreglo con los productos [{ producto_id, producto_codigo, producto_articulo, cantidad, precio_unitario }]
+            detalles
         } = datosPedido;
-
-        // Validar que el pedido contenga al menos un producto
+        // Validación básica de los datos del pedido
         if (!detalles || !Array.isArray(detalles) || detalles.length === 0) {
             throw new AppError('El pedido debe contener al menos un producto en el detalle', 400);
         }
 
-        // 1. Obtenemos una conexión individual del pool para la Transacción
         const connection = await db.getConnection();
-
+        // Iniciar una transacción para asegurar la consistencia de los datos
         try {
-            // 2. Iniciar la Transacción
             await connection.beginTransaction();
 
-            // 3. Calcular el total acumulado del pedido
             const total_pedido = detalles.reduce((acc, item) => {
                 return acc + (item.cantidad * item.precio_unitario);
             }, 0);
 
-            // 4. Insertar la Cabecera del Pedido
             const sqlCabecera = `
                 INSERT INTO pedidos (
                     cliente_codigo, vendedor_codigo, cliente_documento, cliente_nombre,
@@ -45,7 +37,7 @@ const pedidosService = {
                     forma_pago, total_pedido
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `;
-
+            // Ejecutar la inserción de la cabecera del pedido
             const [resultCabecera] = await connection.execute(sqlCabecera, [
                 cliente_codigo,
                 vendedor_codigo,
@@ -60,8 +52,8 @@ const pedidosService = {
             ]);
 
             const pedidoId = resultCabecera.insertId;
-
-            // 5. Insertar cada producto en 'pedidos_detalle'
+            
+            // Preparar la inserción de los detalles del pedido
             const sqlDetalle = `
                 INSERT INTO pedidos_detalle (
                     pedido_id, producto_id, producto_codigo, producto_articulo, cantidad, precio_unitario
@@ -79,7 +71,6 @@ const pedidosService = {
                 ]);
             }
 
-            // 6. Si todo salió bien, confirmamos los cambios en la BD
             await connection.commit();
 
             return {
@@ -89,18 +80,13 @@ const pedidosService = {
             };
 
         } catch (error) {
-            // 7. Si algo falla, revertimos absolutamente todos los cambios
             await connection.rollback();
             throw new AppError(`Error al procesar el pedido: ${error.message}`, 500);
         } finally {
-            // 8. Siempre liberamos la conexión de vuelta al pool
             connection.release();
         }
     },
-
-    // =======================================================
-    // 2. OBTENER TODOS LOS PEDIDOS (LISTADO GENERAL)
-    // =======================================================
+    // Obtener todos los pedidos
     obtenerTodos: async () => {
         const sql = `
             SELECT id, cliente_nombre, cliente_documento, total_pedido, estado, fecha 
@@ -110,12 +96,8 @@ const pedidosService = {
         const [filas] = await db.query(sql);
         return filas;
     },
-
-    // =======================================================
-    // 3. OBTENER UN PEDIDO COMPLETO POR ID (CABECERA + DETALLES)
-    // =======================================================
+    // Obtener un pedido por su ID, incluyendo su detalle
     obtenerPorId: async (id) => {
-        // Consulta Cabecera
         const sqlCabecera = `SELECT * FROM pedidos WHERE id = ?`;
         const [cabecera] = await db.query(sqlCabecera, [id]);
 
@@ -123,7 +105,6 @@ const pedidosService = {
             throw new AppError('El pedido solicitado no existe', 404);
         }
 
-        // Consulta Detalles
         const sqlDetalle = `SELECT * FROM pedidos_detalle WHERE pedido_id = ?`;
         const [detalles] = await db.query(sqlDetalle, [id]);
 
@@ -134,4 +115,4 @@ const pedidosService = {
     }
 };
 
-module.exports = pedidosService;
+export default pedidosService;

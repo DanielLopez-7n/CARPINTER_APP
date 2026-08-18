@@ -1,14 +1,14 @@
-const express = require('express');
-const router = express.Router();
-const pedidosController = require('../controllers/pedidosController');
+import express from 'express';
+import pedidosController from '../controllers/pedidosController.js';
 
-// Rutas base: /api/pedidos
+const router = express.Router();
+
+// Rutas para Pedidos
 router.route('/')
     .post(pedidosController.crearPedido)
     .get(pedidosController.obtenerTodos);
-
-// Rutas con parámetro: /api/pedidos/:id
+// Rutas para Pedidos por ID
 router.route('/:id')
     .get(pedidosController.obtenerPorId);
 
-module.exports = router;
+export default router;

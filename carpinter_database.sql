@@ -156,3 +156,59 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2026-08-11 18:47:22
+
+-- =======================================================
+-- 1. TABLA DE CABECERA DEL PEDIDO (CORREGIDA)
+-- =======================================================
+CREATE TABLE IF NOT EXISTS pedidos (
+    id INT AUTO_INCREMENT PRIMARY KEY,           -- Este es el "Pedido Nº"
+    
+    -- Relaciones para listas desplegables (usando su columna 'codigo')
+    cliente_codigo INT NOT NULL,                     
+    vendedor_codigo INT NOT NULL,                    
+    
+    -- Instantánea de los datos del cliente al momento del pedido
+    cliente_documento VARCHAR(50) NOT NULL,      -- CC o NIT
+    cliente_nombre VARCHAR(150) NOT NULL,
+    cliente_direccion VARCHAR(255),
+    cliente_ciudad VARCHAR(100),
+    cliente_telefono VARCHAR(50),
+    
+    -- Datos operativos del pedido
+    orden_compra VARCHAR(100),                   -- Nº de Orden de Compra (Referencia del cliente)
+    
+    -- ENUMs actúan como listas desplegables fijas
+    forma_pago ENUM('EFECTIVO', 'TRANSFERENCIA', 'TARJETA', 'CREDITO', 'CHEQUE') DEFAULT 'EFECTIVO',
+    estado ENUM('PENDIENTE', 'EN_PROCESO', 'ENTREGADO', 'CANCELADO') DEFAULT 'PENDIENTE',
+    
+    -- Totales y Fechas
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total_pedido DECIMAL(12,2) DEFAULT 0.00,     -- Suma total de todos los productos
+    
+    -- Restricciones de integridad apuntando a la columna 'codigo'
+    FOREIGN KEY (cliente_codigo) REFERENCES clientes(codigo) ON DELETE RESTRICT,
+    FOREIGN KEY (vendedor_codigo) REFERENCES vendedores(CODIGO) ON DELETE RESTRICT
+);
+
+-- =======================================================
+-- 2. TABLA DE DETALLE DEL PEDIDO (PRODUCTOS)
+-- =======================================================
+CREATE TABLE IF NOT EXISTS pedidos_detalle (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    
+    pedido_id INT NOT NULL,                      -- Relación con la cabecera del pedido
+    producto_id INT NOT NULL,                    -- 'productos' sí utiliza 'id' como clave primaria
+    
+    -- Instantánea del producto
+    producto_codigo VARCHAR(50),                 
+    producto_articulo VARCHAR(255),              
+    
+    -- Cálculos matemáticos
+    cantidad INT NOT NULL DEFAULT 1,
+    precio_unitario DECIMAL(12,2) NOT NULL,      -- Precio al que se vendió ese día
+    subtotal DECIMAL(12,2) GENERATED ALWAYS AS (cantidad * precio_unitario) STORED,
+    
+    -- Restricciones
+    FOREIGN KEY (pedido_id) REFERENCES pedidos(id) ON DELETE CASCADE,
+    FOREIGN KEY (producto_id) REFERENCES productos(id) ON DELETE RESTRICT
+);

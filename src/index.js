@@ -2,8 +2,10 @@ import express from 'express';
 import clientesRoutes from './routes/clientesRoutes.js';
 import productosRoutes from './routes/productosRoutes.js';
 import vendedoresRoutes from './routes/vendedoresRoutes.js';
+import pedidosRoutes from './routes/pedidosRoutes.js';
 import { AppError } from './utils/AppError.js';
 import { globalErrorHandler } from './middlewares/errorHandler.js';
+
 
 const app = express();
 
@@ -19,6 +21,7 @@ app.get('/api/health', (req, res) => {
 app.use('/api/clientes', clientesRoutes);
 app.use('/api/vendedores', vendedoresRoutes);
 app.use('/api/productos', productosRoutes);
+app.use('/api/pedidos', pedidosRoutes);
 
 // Manejo de Rutas Inexistentes (404)
 app.all(/(.*)/, (req, res, next) => {

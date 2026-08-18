@@ -4,6 +4,11 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// iniciarMigracion:
+// - Lee varios archivos Excel (inventario, VENDEDORES, CLIENTES).
+// - Crea la tabla 'productos' si hace falta y sube o actualiza los registros en la base de datos.
+// - Ignora filas sin código ni artículo y muestra en consola el progreso.
+// - No recibe parámetros; se ejecuta al final del archivo para comenzar la migración.
 async function iniciarMigracion() {
     try {
         console.log("1. Conectando al servidor MySQL...");

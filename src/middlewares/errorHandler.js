@@ -1,4 +1,4 @@
-import { AppError } from '../utils/AppError.js';
+import AppError from '../utils/AppError.js';
 
 // globalErrorHandler:
 // - Atiende cualquier error que ocurra en la aplicación.

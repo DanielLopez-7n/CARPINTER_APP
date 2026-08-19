@@ -19,6 +19,7 @@ import clientesRoutes from './routes/clientesRoutes.js';
 import productosRoutes from './routes/productosRoutes.js';
 import vendedoresRoutes from './routes/vendedoresRoutes.js';
 import pedidosRoutes from './routes/pedidosRoutes.js';
+import enviosRoutes from './routes/enviosRoutes.js';
 
 /**
  * ============================================================================
@@ -78,6 +79,7 @@ app.use('/api/clientes', clientesRoutes);
 app.use('/api/vendedores', vendedoresRoutes);
 app.use('/api/productos', productosRoutes);
 app.use('/api/pedidos', pedidosRoutes);
+app.use('/api/envios', enviosRoutes);
 
 /**
  * ============================================================================

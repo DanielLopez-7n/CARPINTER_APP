@@ -1,0 +1,251 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <!-- Indica al navegador que el archivo usa caracteres como tildes y la letra ñ. -->
+  <meta charset="UTF-8">
+  <!-- Hace que la página se adapte correctamente a celulares y computadores. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nuevo envío | CARPINTER_APP</title>
+  <!-- Carga los estilos de esta pantalla desde un archivo separado. -->
+  <link rel="stylesheet" href="/css/nuevo_envio.css">
+</head>
+<body>
+  <!-- Contenido principal de la pantalla para registrar un envío. -->
+  <main>
+    <h1>Registrar nuevo envío</h1>
+    <p>Completa la información solicitada para guardar la guía de envío.</p>
+
+    <!--
+      El formulario agrupa todos los datos que se enviarán al servidor.
+      Los atributos "required" impiden continuar si falta un dato obligatorio.
+    -->
+    <form id="formNuevoEnvio">
+      <!-- Información general del envío. -->
+      <section class="seccion-formulario">
+        <h2>Información general</h2>
+
+        <div class="campo">
+          <label for="fecha">Fecha de envío *</label>
+          <input type="date" id="fecha" name="fecha" required>
+        </div>
+
+        <div class="campo">
+          <label for="cliente_id">Cliente *</label>
+          <select id="cliente_id" name="cliente_id" required>
+            <option value="">Cargando clientes...</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="num_factura">Número de factura *</label>
+          <input type="text" id="num_factura" name="num_factura" required>
+        </div>
+
+        <div class="campo">
+          <label for="num_guia">Número de guía *</label>
+          <input type="text" id="num_guia" name="num_guia" required>
+        </div>
+
+        <div class="campo">
+          <label for="transportadora_id">Transportadora *</label>
+          <select id="transportadora_id" name="transportadora_id" required>
+            <option value="">Cargando transportadoras...</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="estado_envio">Estado del envío</label>
+          <select id="estado_envio" name="estado_envio">
+            <option value="Pendiente">Pendiente</option>
+            <option value="En tránsito">En tránsito</option>
+            <option value="Entregado">Entregado</option>
+          </select>
+        </div>
+      </section>
+
+      <!-- Información sobre la carga que se va a transportar. -->
+      <section class="seccion-formulario">
+        <h2>Información de la carga</h2>
+
+        <div class="campo">
+          <label for="unidades">Unidades *</label>
+          <input type="number" id="unidades" name="unidades" min="0" required>
+        </div>
+
+        <div class="campo">
+          <label for="detalle_unidades">Detalle de unidades</label>
+          <input type="text" id="detalle_unidades" name="detalle_unidades">
+        </div>
+
+        <div class="campo">
+          <label for="peso">Peso en kilogramos *</label>
+          <input type="number" id="peso" name="peso" min="0" step="0.01" required>
+        </div>
+      </section>
+
+      <!-- Lugar al que debe llegar el envío. -->
+      <section class="seccion-formulario">
+        <h2>Destino</h2>
+
+        <div class="campo">
+          <label for="ciudad">Ciudad *</label>
+          <input type="text" id="ciudad" name="ciudad" list="lista-ciudades"
+            placeholder="Ej: Medellín" autocomplete="off" required>
+          <!-- Esta lista se llena con ciudades obtenidas desde la API de Colombia. -->
+          <datalist id="lista-ciudades"></datalist>
+        </div>
+
+        <div class="campo">
+          <label for="departamento">Departamento *</label>
+          <input type="text" id="departamento" name="departamento"
+            placeholder="Ej: Antioquia" required>
+        </div>
+      </section>
+
+      <!-- Valores económicos relacionados con la factura y el transporte. -->
+      <section class="seccion-formulario">
+        <h2>Valores</h2>
+
+        <div class="campo">
+          <label for="valor_factura">Valor de la factura *</label>
+          <input type="number" id="valor_factura" name="valor_factura" min="0" step="0.01" required>
+        </div>
+
+        <div class="campo">
+          <label for="valor_flete">Valor del flete *</label>
+          <input type="number" id="valor_flete" name="valor_flete" min="0" step="0.01" required>
+        </div>
+      </section>
+
+      <!-- Botones para guardar o abandonar el registro. -->
+      <div class="acciones">
+        <button type="submit">Guardar envío</button>
+        <a href="/envios">Cancelar</a>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    // Guarda todas las ciudades descargadas para usarlas en el autocompletado.
+    let ciudadesColombia = [];
+
+    // Espera a que el HTML esté listo antes de buscar campos o conectar eventos.
+    document.addEventListener('DOMContentLoaded', () => {
+      // Coloca la fecha actual solo si el campo todavía está vacío.
+      const hoy = new Date().toISOString().split('T')[0];
+      const campoFecha = document.getElementById('fecha');
+      if (campoFecha && !campoFecha.value) campoFecha.value = hoy;
+
+      // Carga desde el backend las opciones de cliente y transportadora.
+      cargarDatosFormulario();
+
+      // Carga las ciudades que aparecerán como sugerencias.
+      cargarCiudadesColombia();
+
+      // Cada vez que cambia la ciudad, intenta completar su departamento.
+      document.getElementById('ciudad').addEventListener('input', autodetectarDepartamento);
+
+      // Conecta el botón de guardado con la función que envía los datos.
+      document.getElementById('formNuevoEnvio').addEventListener('submit', guardarEnvio);
+    });
+
+    // Obtiene clientes y transportadoras registrados en la base de datos.
+    async function cargarDatosFormulario() {
+      try {
+        const respuesta = await fetch('/api/envios/datos-formulario');
+        const { status, data } = await respuesta.json();
+
+        // Solo reemplaza las opciones iniciales si el servidor respondió correctamente.
+        if (status === 'success') {
+          const selectCliente = document.getElementById('cliente_id');
+          const selectTransportadora = document.getElementById('transportadora_id');
+
+          selectCliente.innerHTML = '<option value="">Seleccione un cliente...</option>' +
+            data.clientes.map(cliente =>
+              `<option value="${cliente.id}">${cliente.nombre}</option>`).join('');
+
+          selectTransportadora.innerHTML = '<option value="">Seleccione transportadora...</option>' +
+            data.transportadoras.map(transportadora =>
+              `<option value="${transportadora.id}">${transportadora.nombre}</option>`).join('');
+        }
+      } catch (error) {
+        // La persona todavía podrá intentar completar el formulario manualmente.
+        console.error('Error al cargar datos del formulario:', error);
+      }
+    }
+
+    // Descarga las ciudades de Colombia y las convierte en sugerencias del campo ciudad.
+    async function cargarCiudadesColombia() {
+      try {
+        const respuesta = await fetch('https://api-colombia.com/api/v1/City');
+        ciudadesColombia = await respuesta.json();
+
+        const datalist = document.getElementById('lista-ciudades');
+        datalist.innerHTML = ciudadesColombia
+          .map(ciudad => `<option value="${ciudad.name}">`)
+          .join('');
+      } catch (error) {
+        // Si la API no responde, el campo sigue siendo editable de forma manual.
+        console.warn('No se pudo conectar a la API de Colombia:', error);
+      }
+    }
+
+    // Busca la ciudad escrita y completa su departamento cuando encuentra coincidencia.
+    function autodetectarDepartamento(evento) {
+      const ciudadEscribiendo = evento.target.value.trim().toLowerCase();
+      const coincidencia = ciudadesColombia.find(ciudad =>
+        ciudad.name.toLowerCase() === ciudadEscribiendo);
+
+      // No bloquea la edición: si no hay coincidencia, el departamento queda editable.
+      if (coincidencia && coincidencia.department) {
+        document.getElementById('departamento').value = coincidencia.department.name;
+      }
+    }
+
+    // Recoge los datos, los convierte al tipo correcto y solicita al backend guardarlos.
+    async function guardarEnvio(evento) {
+      evento.preventDefault();
+
+      const datosEnvio = {
+        fecha_envio: document.getElementById('fecha').value,
+        id_cliente: parseInt(document.getElementById('cliente_id').value),
+        numero_factura: document.getElementById('num_factura').value,
+        numero_guia: document.getElementById('num_guia').value,
+        unidades: parseInt(document.getElementById('unidades').value) || 0,
+        detalle_unidades: document.getElementById('detalle_unidades').value,
+        peso_kg: parseFloat(document.getElementById('peso').value) || 0,
+        valor_factura: parseFloat(document.getElementById('valor_factura').value) || 0,
+        ciudad_destino: document.getElementById('ciudad').value,
+        departamento_destino: document.getElementById('departamento').value,
+        id_transportadora: parseInt(document.getElementById('transportadora_id').value),
+        valor_flete: parseFloat(document.getElementById('valor_flete').value) || 0,
+        estado_envio: document.getElementById('estado_envio').value || 'Pendiente'
+      };
+
+      try {
+        // POST significa que se está solicitando la creación de un nuevo registro.
+        const respuesta = await fetch('/api/envios', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(datosEnvio)
+        });
+
+        if (respuesta.ok) {
+          // Después de guardar, regresa a la lista general de envíos.
+          alert('¡Guía de envío guardada exitosamente!');
+          window.location.href = '/envios';
+        } else {
+          // Muestra el mensaje que el backend devuelve cuando rechaza los datos.
+          const errorServidor = await respuesta.json();
+          alert(`Error: ${errorServidor.message}`);
+        }
+      } catch (error) {
+        // Ocurre cuando el navegador no logra comunicarse con el servidor.
+        console.error('Error al guardar el envío:', error);
+        alert('Error al conectar con el servidor.');
+      }
+    }
+  </script>
+</body>
+</html>

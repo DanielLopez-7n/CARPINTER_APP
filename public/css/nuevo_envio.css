@@ -1,0 +1,64 @@
+/* Estilos de la pantalla para registrar un nuevo envio. */
+
+/* Apariencia general de la pagina. */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 24px;
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+/* Contenedor principal que mantiene el formulario centrado. */
+main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 8px;
+}
+
+h1 {
+  margin-top: 0;
+}
+
+/* Cada seccion organiza sus campos en una rejilla adaptable. */
+.seccion-formulario {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* El titulo de la seccion ocupa todo el ancho disponible. */
+.seccion-formulario h2 {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+  font-size: 1.2rem;
+}
+
+/* Coloca cada etiqueta encima de su campo. */
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+input,
+select,
+button {
+  padding: 10px;
+  font-size: 1rem;
+}
+
+/* Alinea los botones de guardar y cancelar. */
+.acciones {
+  display: flex;
+  gap: 12px;
+}
+
+.acciones a,
+.acciones button {
+  cursor: pointer;
+  text-decoration: none;
+}

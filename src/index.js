@@ -50,6 +50,9 @@ const app = express();
 // Middleware para parsear y procesar solicitudes con cuerpo en formato JSON
 app.use(express.json());
 
+// Permite que el navegador cargue archivos públicos como hojas de estilos e imágenes.
+app.use(express.static(path.join(__dirname, '../public')));
+
 /**
  * ============================================================================
  * RUTAS PÚBLICAS Y VISTAS HTML
@@ -70,6 +73,12 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// 3. Rutas para vistas de envíos
+app.get('/envios', (req, res) => res.sendFile(path.join(__dirname, 'templates', 'envios.html')));
+
+// 4. Ruta para crear un nuevo envío (Formulario)
+app.get('/envios/nuevo', (req, res) => res.sendFile(path.join(__dirname, 'templates', 'nuevo_envio.html')));
+app.get('/envios/nuevo_envio', (req, res) => res.sendFile(path.join(__dirname, 'templates', 'nuevo_envio.html')));
 /**
  * ============================================================================
  * REGISTRO DE RUTAS DE LA API (ENDPOINTS)

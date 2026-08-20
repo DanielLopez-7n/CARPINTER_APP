@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>El Carpintero S.A.S | Sistema de Envíos y Logística</title>
+  <link rel="stylesheet" href="/css/home.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Encabezado / Navegación principal -->
+  <header class="navbar">
+    <div class="logo-container">
+      <i class="ri-truck-fill logo-icon"></i>
+      <span class="logo-text">El Carpintero S.A.S</span>
+    </div>
+    <nav class="nav-links">
+      <a href="/" class="active">Inicio</a>
+      <a href="#servicios">Servicios</a>
+      <a href="/envios">Rastrear Guías</a>
+      <a href="/dashboard" class="btn-login"><i class="ri-user-3-line"></i> Ingresar al Dashboard</a>
+    </nav>
+  </header>
+
+  <!-- Carrusel de Imágenes Principal -->
+  <section class="carousel-section">
+    <div class="carousel">
+      <div class="carousel-inner" id="carouselInner">
+        
+        <!-- Slide 1 -->
+        <div class="slide active">
+          <!-- Cambia 'banner1.jpg' por el nombre real de tu imagen en public/images/ -->
+          <img src="/images/banner1.jpg" alt="Logística y Envíos" onerror="this.src='https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1200&q=80'">
+          <div class="slide-caption">
+            <h1>Gestión Inteligente de Envíos</h1>
+            <p>Control total de guías, fletes y transporte de mercancía a nivel nacional.</p>
+            <a href="/dashboard" class="btn-primary">Ver Panel de Control</a>
+          </div>
+        </div>
+
+        <!-- Slide 2 -->
+        <div class="slide">
+          <img src="/images/banner2.jpg" alt="Bodega y Despachos" onerror="this.src='https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=1200&q=80'">
+          <div class="slide-caption">
+            <h1>Eficiencia en Cada Entregable</h1>
+            <p>Conexión directa con las mejores transportadoras del país.</p>
+          </div>
+        </div>
+
+        <!-- Slide 3 -->
+        <div class="slide">
+          <img src="/images/banner3.jpg" alt="Transporte de Carga" onerror="this.src='https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1200&q=80'">
+          <div class="slide-caption">
+            <h1>Rastreo y Transparencia</h1>
+            <p>Consulta en tiempo real el estado de tus mercancías y facturación.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Controles del carrusel -->
+      <button class="carousel-control prev" id="prevSlide"><i class="ri-arrow-left-s-line"></i></button>
+      <button class="carousel-control next" id="nextSlide"><i class="ri-arrow-right-s-line"></i></button>
+
+      <!-- Indicadores -->
+      <div class="carousel-indicators" id="indicators"></div>
+    </div>
+  </section>
+
+  <!-- Sección de Accesos Rápidos / Servicios -->
+  <section class="services" id="servicios">
+    <div class="service-card">
+      <i class="ri-file-add-line service-icon"></i>
+      <h3>Registro de Guías</h3>
+      <p>Digitaliza el ingreso de información de tus paquetes y clientes rápidamente.</p>
+    </div>
+    <div class="service-card">
+      <i class="ri-roadster-line service-icon"></i>
+      <h3>Control de Fletes</h3>
+      <p>Lleva el costo exacto de transporte asignado por cada empresa aliada.</p>
+    </div>
+    <div class="service-card">
+      <i class="ri-bar-chart-box-line service-icon"></i>
+      <h3>Reportes Operativos</h3>
+      <p>Revisa métricas clave sobre paquetes despachados y montos facturados.</p>
+    </div>
+  </section>
+
+  <script>
+    // Lógica interactiva del carrusel de imágenes
+    const slides = document.querySelectorAll('.slide');
+    const prevBtn = document.getElementById('prevSlide');
+    const nextBtn = document.getElementById('nextSlide');
+    const indicatorsContainer = document.getElementById('indicators');
+    let currentSlide = 0;
+
+    // Crear puntos de navegación dinámicos
+    slides.forEach((_, i) => {
+      const dot = document.createElement('div');
+      dot.classList.add('dot');
+      if (i === 0) dot.classList.add('active');
+      dot.addEventListener('click', () => goToSlide(i));
+      indicatorsContainer.appendChild(dot);
+    });
+
+    const dots = document.querySelectorAll('.dot');
+
+    function goToSlide(index) {
+      slides[currentSlide].classList.remove('active');
+      dots[currentSlide].classList.remove('active');
+      
+      currentSlide = (index + slides.length) % slides.length;
+      
+      slides[currentSlide].classList.add('active');
+      dots[currentSlide].classList.add('active');
+    }
+
+    nextBtn.addEventListener('click', () => goToSlide(currentSlide + 1));
+    prevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
+
+    // Rotación automática cada 6 segundos
+    setInterval(() => goToSlide(currentSlide + 1), 6000);
+  </script>
+</body>
+</html>

@@ -1,121 +1,204 @@
 <!DOCTYPE html>
+<!-- Indica que este documento utiliza la versión moderna de HTML. -->
 <html lang="es">
 <head>
-  <!-- Configuración básica de codificación y diseño responsivo -->
+  <!-- Permite mostrar correctamente tildes, ñ y otros caracteres del español. -->
   <meta charset="UTF-8">
+  <!-- Hace que el contenido se adapte al ancho de celulares, tabletas y computadores. -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CARPINTER_APP - API Dashboard</title>
-  
-  <!-- ==========================================================================
-       ESTILOS CSS: Interfaz gráfica en modo oscuro
-       ========================================================================== -->
-  <style>
-    /* Configuración global del cuerpo de la página */
-    body { 
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-      background-color: #0f172a; /* Azul oscuro de fondo */
-      margin: 0; 
-      padding: 40px; 
-      color: #f8fafc; /* Texto claro */
-    }
 
-    /* Contenedor principal que centra el contenido */
-    .container { 
-      max-width: 850px; 
-      margin: 0 auto; 
-      background: #1e293b; /* Tarjeta contenedora */
-      padding: 30px; 
-      border-radius: 12px; 
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3); 
-      border: 1px solid #334155; 
-    }
+  <!-- Texto que aparece en la pestaña del navegador. -->
+  <title>Dashboard | El Carpintero S.A.S</title>
 
-    /* Encabezado principal */
-    h1 { 
-      color: #38bdf8; 
-      border-bottom: 2px solid #334155; 
-      padding-bottom: 12px; 
-      margin-top: 0; 
-    }
+  <!--
+    Conecta este HTML con su archivo de estilos.
+    Las clases usadas en el body, como sidebar y kpi-card, son decoradas
+    por las reglas que se encuentran en public/css/dashboard.css.
+  -->
+  <link rel="stylesheet" href="/css/dashboard.css">
 
-    /* Indicador de estado del servidor en vivo */
-    .status { 
-      display: inline-block; 
-      padding: 6px 14px; 
-      background: #166534; 
-      color: #4ade80; 
-      border-radius: 20px; 
-      font-weight: bold; 
-      font-size: 0.85rem; 
-      margin-bottom: 20px; 
-    }
-
-    /* Rejilla para organizar los accesos a las rutas de la API */
-    .card-grid { 
-      display: grid; 
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); 
-      gap: 16px; 
-      margin-top: 25px; 
-    }
-
-    /* Diseño individual de cada tarjeta de módulo */
-    .card { 
-      background: #0f172a; 
-      border: 1px solid #334155; 
-      border-radius: 8px; 
-      padding: 18px; 
-      text-decoration: none; 
-      color: #f8fafc; 
-      transition: all 0.2s ease; 
-    }
-
-    /* Efecto visual al pasar el cursor sobre la tarjeta */
-    .card:hover { 
-      border-color: #38bdf8; 
-      transform: translateY(-3px); 
-      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2); 
-    }
-
-    .card h3 { margin: 0 0 8px 0; color: #38bdf8; font-size: 1.1rem; }
-    .card p { margin: 0; font-size: 0.85rem; color: #94a3b8; }
-  </style>
+  <!-- Biblioteca externa que proporciona los iconos usados en el dashboard. -->
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body>
-  <div class="container">
-    <!-- Estado del servidor -->
-    <span class="status">● Servidor Activo (Puerto 3000)</span>
-    
-    <!-- Título y descripción -->
-    <h1>CARPINTER_APP - Dashboard API</h1>
-    <p>Selecciona un módulo para consultar los datos de la base de datos MySQL:</p>
-    
-    <!-- Enlaces hacia las rutas JSON creadas en la API -->
-    <div class="card-grid">
-      <a href="/api/clientes" class="card" target="_blank">
-        <h3>👥 Clientes</h3>
-        <p>Consultar directorio de clientes registrados.</p>
-      </a>
 
-      <a href="/api/envios" class="card" target="_blank">
-        <h3>🚚 Envíos</h3>
-        <p>Consultar guías, fletes y transportadoras.</p>
-      </a>
-
-      <a href="/api/pedidos" class="card" target="_blank">
-        <h3>📦 Pedidos</h3>
-        <p>Ver facturas y órdenes de venta.</p>
-      </a>
-
-      <a href="/api/vendedores" class="card" target="_blank">
-        <h3>�‍💼 Vendedores</h3>
-        <p>Consultar información de vendedores.</p>
-      </a>
-
-      <a href="/api/productos" class="card" target="_blank">
-        <h3>🪵 Productos</h3>
-        <p>Consultar catálogo de inventario y precios.</p>
-      </a>
+  <!--
+    MENU LATERAL
+    Esta zona contiene la identidad de la empresa y los accesos principales.
+    La clase sidebar conecta este bloque con el diseño definido en el CSS.
+  -->
+  <aside class="sidebar">
+    <!-- Nombre e icono de la empresa. -->
+    <div class="brand">
+      <i class="ri-box-3-fill brand-icon"></i>
+      <h2>El Carpintero</h2>
     </div>
-  </div>
+
+    <!--
+      Enlaces de navegación hacia las distintas pantallas.
+      La clase active marca visualmente la sección que está abierta.
+    -->
+    <nav class="nav-menu">
+      <a href="/dashboard" class="nav-item active"><i class="ri-dashboard-3-line"></i> Dashboard</a>
+      <a href="/envios" class="nav-item"><i class="ri-truck-line"></i> Envíos</a>
+      <a href="/envios/nuevo_envio" class="nav-item"><i class="ri-add-box-line"></i> Nuevo Envío</a>
+    </nav>
+  </aside>
+
+  <!--
+    CONTENIDO PRINCIPAL
+    main contiene la información que la persona consulta y utiliza.
+    Su clase main-content define el espacio, los márgenes y la distribución.
+  -->
+  <main class="main-content">
+    <!-- Barra superior con el título de la pantalla y el usuario actual. -->
+    <header class="topbar">
+      <h1>Panel de Control Operativo</h1>
+      <div class="user-badge">
+        <i class="ri-user-3-fill"></i>
+        <span>Administrador</span>
+      </div>
+    </header>
+
+    <!--
+      CARRUSEL DE INFORMACIÓN
+      Muestra mensajes informativos de forma rotativa.
+      JavaScript usa el id carouselTrack para mover las diapositivas.
+    -->
+    <section class="carousel-container">
+      <!-- Contenedor que agrupa todas las diapositivas en una fila. -->
+      <div class="carousel-track" id="carouselTrack">
+        <!-- Cada slide representa una pantalla del carrusel. -->
+        <div class="slide slide-1">
+          <div class="slide-overlay">
+            <h2>Control Inteligente de Flota y Envíos</h2>
+            <p>Monitorea fletes, guías y despachos a nivel nacional en tiempo real.</p>
+          </div>
+        </div>
+        <div class="slide slide-2">
+          <div class="slide-overlay">
+            <h2>Optimización de Tiempos de Entrega</h2>
+            <p>Conecta la información de tus transportadoras en una sola plataforma.</p>
+          </div>
+        </div>
+        <div class="slide slide-3">
+          <div class="slide-overlay">
+            <h2>Gestión Eficiente de Clientes y Facturas</h2>
+            <p>Toma decisiones rápidas con reportes consolidados al instante.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Botones que permiten avanzar o retroceder manualmente. -->
+      <button class="carousel-btn prev" id="prevBtn"><i class="ri-arrow-left-s-line"></i></button>
+      <button class="carousel-btn next" id="nextBtn"><i class="ri-arrow-right-s-line"></i></button>
+
+      <!-- JavaScript crea aquí los puntos de navegación automáticamente. -->
+      <div class="carousel-dots" id="carouselDots"></div>
+    </section>
+
+    <!--
+      INDICADORES PRINCIPALES
+      Cada tarjeta resume un dato importante del sistema.
+      Los id permiten que JavaScript pueda actualizar los valores más adelante.
+    -->
+    <section class="kpi-grid">
+      <!-- Cantidad total de envíos registrados. -->
+      <div class="kpi-card">
+        <div class="kpi-icon blue"><i class="ri-space-ship-line"></i></div>
+        <div class="kpi-info">
+          <span>Envíos Totales</span>
+          <h3 id="totalEnvios">0</h3>
+        </div>
+      </div>
+
+      <!-- Valor acumulado de las facturas. -->
+      <div class="kpi-card">
+        <div class="kpi-icon green"><i class="ri-money-dollar-circle-line"></i></div>
+        <div class="kpi-info">
+          <span>Total Facturado</span>
+          <h3 id="totalFacturado">$0</h3>
+        </div>
+      </div>
+
+      <!-- Valor total pagado o registrado por concepto de fletes. -->
+      <div class="kpi-card">
+        <div class="kpi-icon orange"><i class="ri-truck-fill"></i></div>
+        <div class="kpi-info">
+          <span>Gasto Fletes</span>
+          <h3 id="totalFletes">$0</h3>
+        </div>
+      </div>
+
+      <!-- Cantidad de envíos que todavía no han sido completados. -->
+      <div class="kpi-card">
+        <div class="kpi-icon red"><i class="ri-time-line"></i></div>
+        <div class="kpi-info">
+          <span>Pendientes</span>
+          <h3 id="totalPendientes">0</h3>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!--
+    JAVASCRIPT DEL CARRUSEL
+    Este código agrega interacción a los botones, crea los puntos y cambia
+    automáticamente de diapositiva cada cinco segundos.
+  -->
+  <script>
+    // Obtiene los elementos del HTML que necesita controlar el carrusel.
+    const track = document.getElementById('carouselTrack');
+    const slides = Array.from(track.children);
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const dotsNav = document.getElementById('carouselDots');
+
+    // Guarda la posición de la diapositiva que se está mostrando.
+    let currentIndex = 0;
+
+    // Crea un punto por cada diapositiva y permite seleccionarla al hacer clic.
+    slides.forEach((_, index) => {
+      const dot = document.createElement('div');
+      dot.classList.add('dot');
+
+      // El primer punto comienza marcado porque la primera diapositiva es visible.
+      if (index === 0) dot.classList.add('active');
+      dot.addEventListener('click', () => moveToSlide(index));
+      dotsNav.appendChild(dot);
+    });
+
+    // Guarda los puntos creados para poder cambiar cuál aparece activo.
+    const dots = Array.from(dotsNav.children);
+
+    // Mueve el carrusel hasta la diapositiva indicada y actualiza el punto activo.
+    function moveToSlide(index) {
+      track.style.transform = `translateX(-${index * 100}%)`;
+      dots[currentIndex].classList.remove('active');
+      dots[index].classList.add('active');
+      currentIndex = index;
+    }
+
+    // Al pulsar el botón siguiente, avanza una posición.
+    // El operador % permite volver a la primera diapositiva al llegar al final.
+    nextBtn.addEventListener('click', () => {
+      const nextIndex = (currentIndex + 1) % slides.length;
+      moveToSlide(nextIndex);
+    });
+
+    // Al pulsar el botón anterior, retrocede una posición.
+    // La suma slides.length evita obtener una posición negativa.
+    prevBtn.addEventListener('click', () => {
+      const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
+      moveToSlide(prevIndex);
+    });
+
+    // Cambia automáticamente de diapositiva cada cinco segundos.
+    setInterval(() => {
+      const nextIndex = (currentIndex + 1) % slides.length;
+      moveToSlide(nextIndex);
+    }, 5000);
+  </script>
 </body>
 </html>

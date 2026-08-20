@@ -59,26 +59,33 @@ app.use(express.static(path.join(__dirname, '../public')));
  * ============================================================================
  */
 
-// 1. Ruta principal del Panel de Control (Dashboard)
+// 1. Ruta principal de la Home
 app.get('/', (req, res) => {
   /**
-   * Sirve la plantilla HTML almacenada en la carpeta 'templates'.
+   * Sirve la plantilla Home almacenada en la carpeta 'templates'.
    * path.join construye la ruta compatible según el SO (Windows/Linux).
    */
+  res.sendFile(path.join(__dirname, 'templates', 'home.html'));
+});
+
+// 2. Ruta para abrir directamente el Panel de Control.
+app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'templates', 'dashboard.html'));
 });
 
-// 2. Endpoint de monitoreo técnico (Health Check)
+// 3. Endpoint de monitoreo técnico (Health Check)
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// 3. Rutas para vistas de envíos
+// 4. Rutas para vistas de envíos
 app.get('/envios', (req, res) => res.sendFile(path.join(__dirname, 'templates', 'envios.html')));
 
-// 4. Ruta para crear un nuevo envío (Formulario)
+// 5. Ruta para crear un nuevo envío (Formulario)
 app.get('/envios/nuevo', (req, res) => res.sendFile(path.join(__dirname, 'templates', 'nuevo_envio.html')));
+// 6. Ruta alternativa para crear un nuevo envío (Formulario)
 app.get('/envios/nuevo_envio', (req, res) => res.sendFile(path.join(__dirname, 'templates', 'nuevo_envio.html')));
+
 /**
  * ============================================================================
  * REGISTRO DE RUTAS DE LA API (ENDPOINTS)

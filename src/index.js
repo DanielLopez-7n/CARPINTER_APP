@@ -21,6 +21,7 @@ import vendedoresRoutes from './routes/vendedoresRoutes.js';
 import pedidosRoutes from './routes/pedidosRoutes.js';
 import enviosRoutes from './routes/enviosRoutes.js';
 import authRoutes from './routes/authRoutes.js';
+import usuariosRoutes from './routes/usuariosRoutes.js';
 
 /**
  * ============================================================================
@@ -29,6 +30,7 @@ import authRoutes from './routes/authRoutes.js';
  */
 import AppError from './utils/AppError.js';
 import { globalErrorHandler } from './middlewares/errorHandler.js';
+import { protegerVista } from './middlewares/authMiddleware.js';
 
 /**
  * ============================================================================
@@ -76,7 +78,7 @@ app.get('/home', (req, res) => {
 });
 
 // 3. Ruta para abrir directamente el Panel de Control.
-app.get('/dashboard', (req, res) => {
+app.get('/dashboard', protegerVista, (req, res) => {
   res.sendFile(path.join(__dirname, 'templates', 'dashboard.html'));
 });
 
@@ -105,6 +107,7 @@ app.use('/api/productos', productosRoutes);
 app.use('/api/pedidos', pedidosRoutes);
 app.use('/api/envios', enviosRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/usuarios', usuariosRoutes);
 /**
  * ============================================================================
  * CONTROL DE RUTAS NO ENCONTRADAS (404) Y MANEJO DE ERRORES

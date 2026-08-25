@@ -26,3 +26,11 @@ export const crearUsuarioService = async (usuarioData) => {
         rol_id 
     };
 };
+ 
+
+// Servicio para obtener todos los usuarios desde la base de datos
+export const obtenerUsuariosService = async () => {
+    // Traemos todos los usuarios, pero sin la contraseña por seguridad
+    const [usuarios] = await pool.query('SELECT id, nombre, email, rol_id, created_at FROM usuarios');
+    return usuarios;
+};

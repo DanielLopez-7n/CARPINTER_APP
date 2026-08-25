@@ -148,6 +148,14 @@
     automáticamente de diapositiva cada cinco segundos.
   -->
   <script>
+
+    // Validar si el usuario está autenticado al cargar la página
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        alert("Acceso denegado. Por favor inicia sesión.");
+        window.location.href = '/'; // Lo devuelve a la pantalla de login por la fuerza
+    }
     // Obtiene los elementos del HTML que necesita controlar el carrusel.
     const track = document.getElementById('carouselTrack');
     const slides = Array.from(track.children);

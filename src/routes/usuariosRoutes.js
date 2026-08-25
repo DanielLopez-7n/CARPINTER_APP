@@ -5,6 +5,6 @@ import { verificarToken } from '../middlewares/authMiddleware.js';
 const router = Router();
 
 // Ruta: POST /api/usuarios (Protegida con token)
-router.post('/usuarios', verificarToken, crearUsuario);
+router.post('/', verificarToken, crearUsuario);
 
 export default router;

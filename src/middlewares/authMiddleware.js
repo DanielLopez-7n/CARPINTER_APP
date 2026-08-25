@@ -1,19 +1,46 @@
 import jwt from 'jsonwebtoken';
 
-export const verificarToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Formato: Bearer TOKEN
+const JWT_SECRET = process.env.JWT_SECRET || 'secreto_super_seguro';
 
+const obtenerToken = (req) => {
+    const authHeader = req.headers.authorization;
+    const tokenAutorizacion = authHeader && authHeader.startsWith('Bearer ')
+        ? authHeader.split(' ')[1]
+        : null;
+    const tokenCookie = req.headers.cookie?.match(/(?:^|; )token=([^;]+)/)?.[1];
+
+    return tokenAutorizacion || tokenCookie;
+};
+
+const autenticar = (req) => {
+    const token = obtenerToken(req);
     if (!token) {
-        return res.status(403).json({ error: "Token de acceso requerido. Acceso no autorizado." });
+        return { error: 'Token de acceso requerido. Acceso no autorizado.' };
     }
 
-    jwt.verify(token, process.env.JWT_SECRET || 'secreto_super_seguro', (err, usuario) => {
-        if (err) {
-            return res.status(401).json({ error: "Token inválido o expirado." });
-        }
-        
-        req.user = usuario; // Guardamos los datos del usuario decodificados para usarlos en la ruta
-        next(); // Permite continuar con la petición
-    });
+    try {
+        return { usuario: jwt.verify(token, JWT_SECRET) };
+    } catch {
+        return { error: 'Token inválido o expirado.' };
+    }
+};
+
+export const verificarToken = (req, res, next) => {
+    const resultado = autenticar(req);
+    if (resultado.error) {
+        return res.status(resultado.error.includes('requerido') ? 403 : 401).json({ error: resultado.error });
+    }
+
+    req.user = resultado.usuario;
+    next();
+};
+
+export const protegerVista = (req, res, next) => {
+    const resultado = autenticar(req);
+    if (resultado.error) {
+        return res.redirect('/');
+    }
+
+    req.user = resultado.usuario;
+    next();
 };

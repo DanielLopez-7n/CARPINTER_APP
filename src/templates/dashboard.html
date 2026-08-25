@@ -56,7 +56,12 @@
       <h1>Panel de Control Operativo</h1>
       <div class="user-badge">
         <i class="ri-user-3-fill"></i>
-        <span>Administrador</span>
+        <span id="usuarioActual">Usuario</span>
+
+        <!--Botón de Cerrar Sesión -->
+        <button id="btnLogOut" style="background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+          <i class="ri-logout-box-r-line"></i> Salir
+        </button>
       </div>
     </header>
 
@@ -148,65 +153,7 @@
     automáticamente de diapositiva cada cinco segundos.
   -->
   <script>
-
-    // Validar si el usuario está autenticado al cargar la página
-    const token = localStorage.getItem('token');
-
-    if (!token) {
-        alert("Acceso denegado. Por favor inicia sesión.");
-        window.location.href = '/'; // Lo devuelve a la pantalla de login por la fuerza
-    }
-    // Obtiene los elementos del HTML que necesita controlar el carrusel.
-    const track = document.getElementById('carouselTrack');
-    const slides = Array.from(track.children);
-    const nextBtn = document.getElementById('nextBtn');
-    const prevBtn = document.getElementById('prevBtn');
-    const dotsNav = document.getElementById('carouselDots');
-
-    // Guarda la posición de la diapositiva que se está mostrando.
-    let currentIndex = 0;
-
-    // Crea un punto por cada diapositiva y permite seleccionarla al hacer clic.
-    slides.forEach((_, index) => {
-      const dot = document.createElement('div');
-      dot.classList.add('dot');
-
-      // El primer punto comienza marcado porque la primera diapositiva es visible.
-      if (index === 0) dot.classList.add('active');
-      dot.addEventListener('click', () => moveToSlide(index));
-      dotsNav.appendChild(dot);
-    });
-
-    // Guarda los puntos creados para poder cambiar cuál aparece activo.
-    const dots = Array.from(dotsNav.children);
-
-    // Mueve el carrusel hasta la diapositiva indicada y actualiza el punto activo.
-    function moveToSlide(index) {
-      track.style.transform = `translateX(-${index * 100}%)`;
-      dots[currentIndex].classList.remove('active');
-      dots[index].classList.add('active');
-      currentIndex = index;
-    }
-
-    // Al pulsar el botón siguiente, avanza una posición.
-    // El operador % permite volver a la primera diapositiva al llegar al final.
-    nextBtn.addEventListener('click', () => {
-      const nextIndex = (currentIndex + 1) % slides.length;
-      moveToSlide(nextIndex);
-    });
-
-    // Al pulsar el botón anterior, retrocede una posición.
-    // La suma slides.length evita obtener una posición negativa.
-    prevBtn.addEventListener('click', () => {
-      const prevIndex = (currentIndex - 1 + slides.length) % slides.length;
-      moveToSlide(prevIndex);
-    });
-
-    // Cambia automáticamente de diapositiva cada cinco segundos.
-    setInterval(() => {
-      const nextIndex = (currentIndex + 1) % slides.length;
-      moveToSlide(nextIndex);
-    }, 5000);
   </script>
+  <script src="/js/dashboard.js"></script>
 </body>
 </html>

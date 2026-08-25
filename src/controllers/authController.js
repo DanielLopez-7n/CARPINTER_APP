@@ -52,6 +52,11 @@ export const login = async (req, res) => {
             expiresIn: '8h'
         });
 
+        res.setHeader(
+            'Set-Cookie',
+            `token=${token}; HttpOnly; Max-Age=${8 * 60 * 60}; Path=/; SameSite=Lax`
+        );
+
         // 5. Responder al cliente con el token y sus datos básicos
         res.json({
             mensaje: "¡Login exitoso!",
@@ -68,4 +73,9 @@ export const login = async (req, res) => {
         console.error("❌ Error en el login:", error);
         res.status(500).json({ error: "Error interno del servidor" });
     }
+};
+
+export const logout = (req, res) => {
+    res.setHeader('Set-Cookie', 'token=; HttpOnly; Max-Age=0; Path=/; SameSite=Lax');
+    res.status(204).send();
 };

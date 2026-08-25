@@ -19,6 +19,9 @@ import clientesRoutes from './routes/clientesRoutes.js';
 import productosRoutes from './routes/productosRoutes.js';
 import vendedoresRoutes from './routes/vendedoresRoutes.js';
 import pedidosRoutes from './routes/pedidosRoutes.js';
+import enviosRoutes from './routes/enviosRoutes.js';
+import authRoutes from './routes/authRoutes.js';
+import usuariosRoutes from './routes/usuariosRoutes.js';
 
 /**
  * ============================================================================
@@ -27,6 +30,7 @@ import pedidosRoutes from './routes/pedidosRoutes.js';
  */
 import AppError from './utils/AppError.js';
 import { globalErrorHandler } from './middlewares/errorHandler.js';
+import { protegerVista } from './middlewares/authMiddleware.js';
 
 /**
  * ============================================================================
@@ -49,25 +53,48 @@ const app = express();
 // Middleware para parsear y procesar solicitudes con cuerpo en formato JSON
 app.use(express.json());
 
+// Permite que el navegador cargue archivos públicos como hojas de estilos e imágenes.
+app.use(express.static(path.join(__dirname, '../public')));
+
 /**
  * ============================================================================
  * RUTAS PÚBLICAS Y VISTAS HTML
  * ============================================================================
  */
 
-// 1. Ruta principal del Panel de Control (Dashboard)
+// 1. Ruta para mostrar el HTML del Login
 app.get('/', (req, res) => {
+    res.sendFile(path.join(process.cwd(), 'src/templates/login.html'));
+});
+
+
+// 2. Ruta principal de la Home
+app.get('/home', (req, res) => {
   /**
-   * Sirve la plantilla HTML almacenada en la carpeta 'templates'.
+   * Sirve la plantilla Home almacenada en la carpeta 'templates'.
    * path.join construye la ruta compatible según el SO (Windows/Linux).
    */
+  res.sendFile(path.join(__dirname, 'templates', 'home.html'));
+});
+
+// 3. Ruta para abrir directamente el Panel de Control.
+app.get('/dashboard', protegerVista, (req, res) => {
   res.sendFile(path.join(__dirname, 'templates', 'dashboard.html'));
 });
 
-// 2. Endpoint de monitoreo técnico (Health Check)
+// 4. Endpoint de monitoreo técnico (Health Check)
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
+
+// 5. Rutas para vistas de envíos
+app.get('/envios', (req, res) => res.sendFile(path.join(__dirname, 'templates', 'envios.html')));
+
+// 6. Ruta para crear un nuevo envío (Formulario)
+app.get('/envios/nuevo', (req, res) => res.sendFile(path.join(__dirname, 'templates', 'nuevo_envio.html')));
+
+// 7. Ruta alternativa para crear un nuevo envío (Formulario)
+app.get('/envios/nuevo_envio', (req, res) => res.sendFile(path.join(__dirname, 'templates', 'nuevo_envio.html')));
 
 /**
  * ============================================================================
@@ -78,7 +105,9 @@ app.use('/api/clientes', clientesRoutes);
 app.use('/api/vendedores', vendedoresRoutes);
 app.use('/api/productos', productosRoutes);
 app.use('/api/pedidos', pedidosRoutes);
-
+app.use('/api/envios', enviosRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/usuarios', usuariosRoutes);
 /**
  * ============================================================================
  * CONTROL DE RUTAS NO ENCONTRADAS (404) Y MANEJO DE ERRORES

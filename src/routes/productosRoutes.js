@@ -6,15 +6,18 @@ import {
   actualizarProducto,
   eliminarProducto
 } from '../controllers/productosController.js';
+import { verificarToken } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
 // Rutas para manejar productos
 // - GET '/'       : devuelve todos los productos
 // - POST '/'      : crea un producto nuevo (datos en req.body)
+// - verificarToken middleware se aplica a las rutas que requieren autenticación
 router.route('/')
-  .get(obtenerProductos)
-  .post(crearProducto);
+  .get(verificarToken, obtenerProductos)
+  .post(verificarToken, crearProducto);
+  
 
 // Rutas para un producto específico (usa :id en la URL)
 // - GET '/:id'    : obtiene un producto por su id

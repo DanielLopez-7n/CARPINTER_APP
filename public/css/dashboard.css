@@ -1,0 +1,298 @@
+/* ============================================================================
+  ESTILOS DEL PANEL PRINCIPAL
+  ============================================================================
+  Este archivo define la apariencia del dashboard: colores, menu lateral,
+  contenido principal, carrusel y tarjetas con indicadores.
+  El HTML utiliza estos estilos mediante clases como .sidebar, .slide y
+  .kpi-card.
+*/
+
+/* ============================================================================
+  COLORES GENERALES
+  ============================================================================
+  Estas variables permiten reutilizar los mismos colores en todo el archivo.
+  Si se cambia un valor aqui, se actualiza cada elemento que lo utilice.
+*/
+:root {
+  --blue-primary: #1d4ed8;
+  --blue-hover: #1e40af;
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --text-primary: #0f172a;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+}
+
+/*
+  Regla general para todos los elementos.
+  box-sizing evita que el relleno y los bordes hagan crecer inesperadamente
+  el ancho o alto de un elemento.
+  margin y padding se reinician para comenzar con medidas controladas.
+*/
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ============================================================================
+  ESTRUCTURA GENERAL DE LA PAGINA
+  ============================================================================
+  body usa flexbox para colocar el menu lateral y el contenido principal
+  uno al lado del otro.
+*/
+body {
+  display: flex;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+/* ============================================================================
+  MENU LATERAL
+  ============================================================================
+  El menu permanece como una columna de ancho fijo a la izquierda.
+*/
+.sidebar {
+  width: 250px;
+  background-color: #0f172a;
+  color: #fff;
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Organiza el icono y el nombre de la empresa en una misma fila. */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+/* Ajusta el tamano y color del icono de la marca. */
+.brand-icon {
+  font-size: 28px;
+  color: var(--blue-primary);
+}
+
+/* Coloca los enlaces del menu uno debajo del otro. */
+.nav-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Apariencia normal de cada enlace del menu. */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  color: #94a3b8;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+/*
+  Resalta el enlace sobre el que esta el cursor o la seccion actual.
+  La clase active se agrega desde el HTML al enlace seleccionado.
+*/
+.nav-item:hover, .nav-item.active {
+  background-color: var(--blue-primary);
+  color: #ffffff;
+}
+
+/* ============================================================================
+  CONTENIDO PRINCIPAL
+  ============================================================================
+  Este espacio ocupa todo el ancho que queda despues del menu lateral.
+*/
+.main-content {
+  flex: 1;
+  padding: 32px;
+  overflow-y: auto;
+}
+
+/* Barra superior con el titulo del dashboard y el usuario. */
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+/* Pequena identificacion visual del usuario conectado. */
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--bg-card);
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  font-weight: 500;
+}
+
+/* ============================================================================
+  CARRUSEL DE INFORMACION
+  ============================================================================
+  El carrusel muestra un solo slide a la vez. JavaScript cambia la posicion
+  de .carousel-track para desplazar las diapositivas horizontalmente.
+*/
+.carousel-container {
+  position: relative;
+  width: 100%;
+  height: 240px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  margin-bottom: 32px;
+}
+
+/* Contenedor flexible que mantiene todas las diapositivas en una fila. */
+.carousel-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.5s ease-in-out;
+}
+
+/* Cada diapositiva ocupa el ancho completo del carrusel. */
+.slide {
+  min-width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+/* Fondos diferentes para identificar visualmente cada diapositiva. */
+.slide-1 {
+  background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+}
+.slide-2 {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+}
+.slide-3 {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+}
+
+/*
+  Capa inferior que mejora la lectura del texto sobre el fondo.
+  El degradado es transparente arriba y mas oscuro abajo.
+*/
+.slide-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 32px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.7));
+  color: #fff;
+}
+
+/* Botones circulares para avanzar o retroceder en el carrusel. */
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(255,255,255,0.2);
+  backdrop-filter: blur(4px);
+  border: none;
+  color: white;
+  font-size: 24px;
+  padding: 8px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+/* Cambia el fondo del boton cuando el cursor pasa sobre el. */
+.carousel-btn:hover {
+  background: rgba(255,255,255,0.5);
+}
+
+/* Ubica cada boton en un extremo del carrusel. */
+.carousel-btn.prev { left: 16px; }
+.carousel-btn.next { right: 16px; }
+
+/* Contenedor de los puntos que indican la diapositiva actual. */
+.carousel-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+}
+
+/* Punto que representa una diapositiva que no esta seleccionada. */
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.4);
+  cursor: pointer;
+}
+
+/* Punto de la diapositiva visible actualmente. */
+.dot.active {
+  background: #ffffff;
+  width: 24px;
+  border-radius: 5px;
+}
+
+/* ============================================================================
+  TARJETAS DE INDICADORES
+  ============================================================================
+  Los KPI son datos resumidos del sistema, como total de envios, facturacion
+  y envios pendientes. JavaScript actualiza sus valores en el HTML.
+*/
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+/* Tarjeta individual que agrupa un icono y su informacion. */
+.kpi-card {
+  background-color: var(--bg-card);
+  padding: 20px;
+  border-radius: 12px;
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Caja de tamano fijo para mantener alineados los iconos. */
+.kpi-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+/* Cada color ayuda a distinguir el tipo de indicador. */
+.kpi-icon.blue { background-color: #dbeafe; color: #1d4ed8; }
+.kpi-icon.green { background-color: #dcfce7; color: #15803d; }
+.kpi-icon.orange { background-color: #ffedd5; color: #c2410c; }
+.kpi-icon.red { background-color: #fee2e2; color: #b91c1c; }
+
+.kpi-info span {
+/* Texto pequeno que describe el indicador. */
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Numero principal mostrado dentro de cada tarjeta. */
+.kpi-info h3 {
+  font-size: 22px;
+  margin-top: 4px;
+}

@@ -20,6 +20,7 @@ import productosRoutes from './routes/productosRoutes.js';
 import vendedoresRoutes from './routes/vendedoresRoutes.js';
 import pedidosRoutes from './routes/pedidosRoutes.js';
 import enviosRoutes from './routes/enviosRoutes.js';
+import authRoutes from './routes/authRoutes.js';
 
 /**
  * ============================================================================
@@ -59,8 +60,14 @@ app.use(express.static(path.join(__dirname, '../public')));
  * ============================================================================
  */
 
-// 1. Ruta principal de la Home
+// 1. Ruta para mostrar el HTML del Login
 app.get('/', (req, res) => {
+    res.sendFile(path.join(process.cwd(), 'src/templates/login.html'));
+});
+
+
+// 2. Ruta principal de la Home
+app.get('/home', (req, res) => {
   /**
    * Sirve la plantilla Home almacenada en la carpeta 'templates'.
    * path.join construye la ruta compatible según el SO (Windows/Linux).
@@ -68,22 +75,23 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'templates', 'home.html'));
 });
 
-// 2. Ruta para abrir directamente el Panel de Control.
+// 3. Ruta para abrir directamente el Panel de Control.
 app.get('/dashboard', (req, res) => {
   res.sendFile(path.join(__dirname, 'templates', 'dashboard.html'));
 });
 
-// 3. Endpoint de monitoreo técnico (Health Check)
+// 4. Endpoint de monitoreo técnico (Health Check)
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// 4. Rutas para vistas de envíos
+// 5. Rutas para vistas de envíos
 app.get('/envios', (req, res) => res.sendFile(path.join(__dirname, 'templates', 'envios.html')));
 
-// 5. Ruta para crear un nuevo envío (Formulario)
+// 6. Ruta para crear un nuevo envío (Formulario)
 app.get('/envios/nuevo', (req, res) => res.sendFile(path.join(__dirname, 'templates', 'nuevo_envio.html')));
-// 6. Ruta alternativa para crear un nuevo envío (Formulario)
+
+// 7. Ruta alternativa para crear un nuevo envío (Formulario)
 app.get('/envios/nuevo_envio', (req, res) => res.sendFile(path.join(__dirname, 'templates', 'nuevo_envio.html')));
 
 /**
@@ -96,7 +104,7 @@ app.use('/api/vendedores', vendedoresRoutes);
 app.use('/api/productos', productosRoutes);
 app.use('/api/pedidos', pedidosRoutes);
 app.use('/api/envios', enviosRoutes);
-
+app.use('/api/auth', authRoutes);
 /**
  * ============================================================================
  * CONTROL DE RUTAS NO ENCONTRADAS (404) Y MANEJO DE ERRORES

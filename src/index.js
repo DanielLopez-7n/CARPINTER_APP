@@ -23,6 +23,7 @@ import enviosRoutes from './routes/enviosRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import usuariosRoutes from './routes/usuariosRoutes.js';
 
+
 /**
  * ============================================================================
  * UTILIDADES Y MIDDLEWARES
@@ -95,6 +96,10 @@ app.get('/envios/nuevo', (req, res) => res.sendFile(path.join(__dirname, 'templa
 
 // 7. Ruta alternativa para crear un nuevo envío (Formulario)
 app.get('/envios/nuevo_envio', (req, res) => res.sendFile(path.join(__dirname, 'templates', 'nuevo_envio.html')));
+
+// 8. Ruta para ver el catálogo de productos
+app.get('/productos', protegerVista, (req, res) => {res.sendFile(path.join(__dirname, 'templates', 'productos.html'));
+});
 
 /**
  * ============================================================================
